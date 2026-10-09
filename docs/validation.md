@@ -51,11 +51,15 @@ sur mobile. Captures dans [screenshots/](screenshots/) :
 
 ## Limites de la validation
 
-La CI fournie teste aussi PostgreSQL 16 et d’autres versions Python, mais elle n’a
-pas été exécutée sur GitHub : aucun dépôt distant n’a été créé. PostgreSQL n’a pas
-été testé localement, car le service Docker de cette machine est arrêté. La
-compatibilité repose ici sur l’ORM et les migrations portables, complétés par le
-job PostgreSQL prêt à être lancé lors de la publication du dépôt.
+Le MVP a été publié sur [Brechoire/django-project](https://github.com/Brechoire/django-project)
+le 9 octobre 2026. Les sept jobs du [premier contrôle GitHub Actions](https://github.com/Brechoire/django-project/actions/runs/37987791520)
+ont réussi : cinq configurations SQLite couvrant Python 3.10, 3.12 et 3.14 avec
+Django 5.2, 6.0 et 6.1, un job PostgreSQL 16 et un job de compilation/audit des
+ressources front-end. Chaque configuration SQLite vérifie aussi la construction
+du paquet et son installation dans un environnement indépendant.
+
+PostgreSQL n’a pas été testé localement, car le service Docker de cette machine
+est arrêté ; sa validation a été réalisée dans GitHub Actions.
 
 Un audit complet RGAA/WCAG, un test avec lecteur d’écran, les essais de charge et
 une revue de déploiement du projet hôte restent à effectuer selon votre contexte.
