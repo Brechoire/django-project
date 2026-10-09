@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dpm:task-input:v1",
+  "title": "Champs modifiables d’une tâche — v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "title": {"type": "string", "minLength": 1, "maxLength": 200},
+    "description": {"type": "string"},
+    "category": {"enum": ["feature", "bug", "optimization", "security", "docs", "test"]},
+    "priority": {"enum": ["low", "normal", "high", "critical"]},
+    "status": {"enum": ["todo", "doing", "waiting", "done"]},
+    "acceptance_criteria": {"type": "string"},
+    "commits": {"type": "string"},
+    "due_date": {"type": ["string", "null"], "format": "date"}
+  },
+  "$comment": "create exige title et refuse done ; update accepte un sous-ensemble. Les règles métier de clôture s’ajoutent au schéma."
+}

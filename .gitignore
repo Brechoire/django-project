@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+*.sqlite3
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+node_modules/
+staticfiles/
+.env
+.demo-secret
+.ruff_cache/

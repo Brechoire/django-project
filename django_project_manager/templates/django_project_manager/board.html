@@ -1,0 +1,6 @@
+{% extends 'django_project_manager/base.html' %}
+{% block title %}Tableau de bord · Project Manager{% endblock %}
+{% block content %}<div class="heading"><div><p class="eyebrow">Du plan à la réalisation</p><h1>Tableau de bord</h1><p>Organisez les idées. Suivez le travail. Vérifiez les résultats.</p></div>
+{% if perms.django_project_manager.add_task %}<a class="btn btn-primary" href="{% url 'django_project_manager:task_create' %}"><span aria-hidden="true">＋</span> Nouvelle tâche</a>{% endif %}</div>
+<div id="board-content">{% include 'django_project_manager/board_content.html' %}</div>
+<p class="footer-note">{% if perms.django_project_manager.change_task %}Déplacez une carte entre les colonnes, ou utilisez son sélecteur de statut. {% endif %}Une tâche terminée exige une vérification et un contrôle récent.</p>{% endblock %}

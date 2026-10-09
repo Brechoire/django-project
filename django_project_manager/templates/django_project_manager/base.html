@@ -1,0 +1,27 @@
+{% load static %}<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Django Project Manager{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'django_project_manager/app.css' %}">
+<script src="{% static 'django_project_manager/theme.js' %}"></script>
+<script src="{% static 'django_project_manager/vendor/htmx.min.js' %}" defer></script>
+<script src="{% static 'django_project_manager/app.js' %}" defer></script></head>
+<body><a href="#main" class="skip-link">Aller au contenu</a>
+{% block layout %}<div class="shell">
+<aside class="sidebar" aria-label="Navigation principale">
+<a class="brand" href="{% url 'django_project_manager:board' %}"><span class="brand-icon" aria-hidden="true">▥</span>Project Manager</a>
+<div class="workspace"><strong>Espace de développement</strong><span>Django · Votre projet</span></div>
+<nav class="nav"><p class="nav-label">Vue d’ensemble</p>
+<a href="{% url 'django_project_manager:board' %}" class="{% if section == 'board' %}active{% endif %}"><span class="nav-icon" aria-hidden="true">▦</span>Tableau de bord</a>
+<a href="{% url 'django_project_manager:board' %}?category=bug"><span class="nav-icon" aria-hidden="true">⊙</span>Suivi des bugs</a>
+{% if perms.django_project_manager.view_aisession %}<a href="{% url 'django_project_manager:sessions' %}" class="{% if section == 'sessions' %}active{% endif %}"><span class="nav-icon" aria-hidden="true">✧</span>Sessions IA</a>{% endif %}
+{% if perms.django_project_manager.view_activity %}<a href="{% url 'django_project_manager:history' %}" class="{% if section == 'history' %}active{% endif %}"><span class="nav-icon" aria-hidden="true">↺</span>Journal</a>{% endif %}
+{% if perms.django_project_manager.view_testrun %}<a href="{% url 'django_project_manager:tests' %}" class="{% if section == 'tests' %}active{% endif %}"><span class="nav-icon" aria-hidden="true">✓</span>Tests & vérifications</a>{% endif %}
+{% if perms.django_project_manager.view_note %}<a href="{% url 'django_project_manager:notes' %}" class="{% if section == 'notes' %}active{% endif %}"><span class="nav-icon" aria-hidden="true">▤</span>Notes & décisions</a>{% endif %}
+<a href="{% url 'django_project_manager:stats' %}" class="{% if section == 'stats' %}active{% endif %}"><span class="nav-icon" aria-hidden="true">◴</span>Statistiques</a>
+</nav><div class="sidebar-foot"><strong>Votre prochaine étape, au clair.</strong><p>Un espace partagé pour vous et vos agents de développement.</p><span>VERSION 0.1 · LOCAL & OUVERT</span></div>
+</aside><div><header class="topbar"><span class="breadcrumb">Votre projet <span aria-hidden="true"> / </span><strong>Développement</strong></span>
+<div class="userbar"><button class="btn" id="theme-toggle" type="button" title="Alterner entre le mode clair et le mode sombre" aria-label="Changer le thème">◐ <span>Thème</span></button>
+<span class="avatar" aria-hidden="true">{{ request.user.get_username|first|upper }}</span><span class="small">{{ request.user.get_username }}</span>
+<form action="{% url 'django_project_manager:logout' %}" method="post">{% csrf_token %}<button class="btn" type="submit">Déconnexion</button></form></div></header>
+<main id="main" class="main">{% block content %}{% endblock %}</main></div></div>{% endblock %}
+<div id="interaction-status" class="sr-only" role="status" aria-live="polite"></div></body></html>

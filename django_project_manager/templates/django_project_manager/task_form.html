@@ -1,0 +1,3 @@
+{% extends 'django_project_manager/base.html' %}{% block title %}{{ heading }} · Project Manager{% endblock %}
+{% block content %}<div class="heading"><div><p class="eyebrow">Définir la prochaine étape</p><h1>{{ heading }}</h1><p>Des objectifs clairs rendent le travail vérifiable.</p></div><a href="{% url 'django_project_manager:board' %}" class="btn">← Tableau</a></div>
+{% include 'django_project_manager/messages.html' %}<div class="panel max-w-3xl"><form method="post" class="form-stack">{% csrf_token %}{{ form.as_p }}<p class="small muted">Écrivez un critère par ligne. Décrivez le résultat attendu, par exemple : « Un lecteur ne peut pas modifier les tâches ».</p><button type="submit" class="btn btn-primary">Enregistrer la tâche</button></form></div>{% endblock %}

@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dpm:response:v1",
+  "title": "Réponse des commandes dpm — v1",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "ok", "data", "errors"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "ok": {"type": "boolean"},
+    "errors": {"type": "array", "items": {"type": "string"}},
+    "data": {"oneOf": [
+      {"type": "null"},
+      {"type": "object", "additionalProperties": false, "required": ["task"], "properties": {"task": {"$ref": "#/$defs/task"}}},
+      {"type": "object", "additionalProperties": false, "required": ["tasks"], "properties": {"tasks": {"type": "array", "items": {"$ref": "#/$defs/task"}}}},
+      {"type": "object", "additionalProperties": false, "required": ["path"], "properties": {"path": {"type": "string"}}},
+      {"type": "object", "additionalProperties": false, "required": ["deleted_id"], "properties": {"deleted_id": {"type": "integer"}}}
+    ]}
+  },
+  "allOf": [
+    {"if": {"properties": {"ok": {"const": false}}}, "then": {"properties": {"data": {"type": "null"}, "errors": {"minItems": 1}}}},
+    {"if": {"properties": {"ok": {"const": true}}}, "then": {"properties": {"data": {"type": "object"}, "errors": {"maxItems": 0}}}}
+  ],
+  "$defs": {
+    "task": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "title", "description", "category", "priority", "status", "acceptance_criteria", "acceptance_verified", "verification_notes", "commits", "due_date", "archived", "created_at", "updated_at", "subtasks", "test_runs"],
+      "properties": {
+        "id": {"type": "integer", "minimum": 1},
+        "title": {"type": "string"}, "description": {"type": "string"},
+        "category": {"enum": ["feature", "bug", "optimization", "security", "docs", "test"]},
+        "priority": {"enum": ["low", "normal", "high", "critical"]},
+        "status": {"enum": ["todo", "doing", "waiting", "done"]},
+        "acceptance_criteria": {"type": "string"}, "acceptance_verified": {"type": "boolean"},
+        "verification_notes": {"type": "string"}, "commits": {"type": "string"},
+        "due_date": {"type": ["string", "null"], "format": "date"}, "archived": {"type": "boolean"},
+        "created_at": {"type": "string", "format": "date-time"}, "updated_at": {"type": "string", "format": "date-time"},
+        "subtasks": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["id", "title", "done"], "properties": {"id": {"type": "integer"}, "title": {"type": "string"}, "done": {"type": "boolean"}}}},
+        "test_runs": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["id", "command", "result", "notes", "created_at"], "properties": {"id": {"type": "integer"}, "command": {"type": "string"}, "result": {"enum": ["passed", "failed", "skipped"]}, "notes": {"type": "string"}, "created_at": {"type": "string", "format": "date-time"}}}}
+      }
+    }
+  }
+}

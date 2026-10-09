@@ -1,0 +1,23 @@
+{% include 'django_project_manager/messages.html' %}
+<section class="metrics" aria-label="Progression du projet">
+<div class="metric"><div class="metric-label">Tâches {% if archived %}archivées{% else %}actives{% endif %}</div><div class="number">{{ total }} <span>une vue d’ensemble partagée</span></div></div>
+<div class="metric"><div class="metric-label">En cours</div><div class="number">{{ doing }} <span>le travail avance</span></div></div>
+<div class="metric"><div class="metric-label">Progression</div><div class="number">{{ progress }} % <span>{{ done }} tâche{{ done|pluralize }} terminée{{ done|pluralize }}</span></div><progress value="{{ progress }}" max="100" aria-label="Progression du projet : {{ progress }} %">{{ progress }} %</progress></div>
+</section>
+<div class="toolbar"><form class="filters" action="{% url 'django_project_manager:board' %}" method="get" hx-get="{% url 'django_project_manager:board' %}" hx-target="#board-content" hx-push-url="true">
+<label class="sr-only" for="search">Rechercher des tâches</label><input id="search" name="q" placeholder="Rechercher une tâche…" value="{{ q }}" type="search">
+<label class="sr-only" for="category">Catégorie</label><select id="category" name="category"><option value="">Toutes les catégories</option>{% for key,label in categories %}<option value="{{ key }}" {% if category == key %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+<label class="sr-only" for="priority">Priorité</label><select id="priority" name="priority"><option value="">Toutes les priorités</option>{% for key,label in priorities %}<option value="{{ key }}" {% if priority == key %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+{% if archived %}<input type="hidden" name="archived" value="1">{% endif %}<button class="btn" type="submit" title="Appliquer la recherche et les filtres">Filtrer <span class="htmx-indicator" aria-hidden="true">…</span></button></form>
+<a class="view-label" href="{% url 'django_project_manager:board' %}{% if not archived %}?archived=1{% endif %}">{% if archived %}← Tâches actives{% else %}Consulter les archives →{% endif %}</a></div>
+<section class="kanban" aria-label="Tableau Kanban">{% for column in columns %}
+<section class="column" data-status="{{ column.key }}" aria-labelledby="column-{{ column.key }}"><div class="column-head"><span class="dot dot-{{ column.key }}" aria-hidden="true"></span><h2 id="column-{{ column.key }}" class="text-xs m-0">{{ column.label }}</h2><span class="column-count">{{ column.tasks|length }}</span></div>
+{% for task in column.tasks %}<article class="card" {% if perms.django_project_manager.change_task %}draggable="true" data-task-id="{{ task.pk }}" data-move-url="{% url 'django_project_manager:task_action' task.pk 'move' %}"{% endif %}>
+<div class="card-top"><span class="task-id">DPM–{{ task.pk|stringformat:'03d' }}</span><span class="badge badge-{{ task.priority }}">{{ task.get_priority_display }}</span></div>
+<a class="card-title" href="{% url 'django_project_manager:task_detail' task.pk %}">{{ task.title }}</a>
+<p class="card-description">{{ task.description|truncatechars:90 }}</p>
+<div class="card-footer"><span class="badge">{{ task.get_category_display }}</span><span title="Sous-tâches terminées">{% if task.subtask_count %}✓ {{ task.completed_subtask_count }}/{{ task.subtask_count }}{% else %}{{ task.created_at|date:'d M' }}{% endif %}</span></div>
+{% if task.due_date %}<p class="small muted mt-2 mb-0">Échéance : {{ task.due_date|date:'d/m/Y' }}</p>{% endif %}
+{% if perms.django_project_manager.change_task %}<form class="card-action" method="post" action="{% url 'django_project_manager:task_action' task.pk 'move' %}" hx-post="{% url 'django_project_manager:task_action' task.pk 'move' %}?{{ request.GET.urlencode }}" hx-target="#board-content">
+{% csrf_token %}<label class="sr-only" for="status-{{ task.pk }}">Statut de {{ task.title }}</label><select name="status" id="status-{{ task.pk }}">{% for other in columns %}<option value="{{ other.key }}" {% if other.key == task.status %}selected{% endif %}>{{ other.label }}</option>{% endfor %}</select><button class="btn" title="Déplacer cette tâche" type="submit">Déplacer</button></form>{% endif %}
+</article>{% empty %}<div class="empty">Aucune tâche ici.<br>La suite s’écrit bientôt.</div>{% endfor %}</section>{% endfor %}</section>

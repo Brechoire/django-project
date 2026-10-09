@@ -1,0 +1,64 @@
+name: Tests et paquet
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  sqlite:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - {python: '3.10', django: '>=5.2,<5.3'}
+          - {python: '3.12', django: '>=5.2,<5.3'}
+          - {python: '3.12', django: '>=6.0,<6.1'}
+          - {python: '3.12', django: '>=6.1,<6.2'}
+          - {python: '3.14', django: '>=6.1,<6.2'}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '${{ matrix.python }}'
+      - run: python -m pip install -e . 'Django${{ matrix.django }}' build
+      - run: python manage.py check
+      - run: python manage.py makemigrations --check --dry-run
+      - run: python manage.py test tests
+      - run: python -m build
+      - run: python -m venv /tmp/dpm-host
+      - run: /tmp/dpm-host/bin/python -m pip install dist/*.whl
+      - run: /tmp/dpm-host/bin/python scripts/check_installed.py
+  postgres:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: dpm
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci-local-only
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    env:
+      POSTGRES_DB: dpm
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ci-local-only
+      POSTGRES_HOST: localhost
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e '.[postgres]'
+      - run: python manage.py test tests
+  assets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm audit
+      - run: npm run build:css
+      - run: git diff --exit-code -- django_project_manager/static/django_project_manager/app.css

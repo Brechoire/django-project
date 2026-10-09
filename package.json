@@ -1,0 +1,12 @@
+{
+  "name": "django-project-manager-assets",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -i assets/input.css -o django_project_manager/static/django_project_manager/app.css --minify"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.0",
+    "htmx.org": "2.0.8",
+    "tailwindcss": "4.3.0"
+  }
+}

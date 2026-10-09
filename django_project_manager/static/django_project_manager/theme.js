@@ -1,0 +1,1 @@
+(() => { try { const stored = localStorage.getItem('dpm-theme'); const dark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches; document.documentElement.classList.toggle('dark', dark); } catch (_) {} })();
